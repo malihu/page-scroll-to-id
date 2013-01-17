@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Google Chrome Frame -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<!-- Reset iPhone Viewport & Initial Scale -->
+<meta name="viewport" content="width=device-width; initial-scale=1.0">
+<title>Animate page to id with jquery - plugin demo</title>
+<!-- CSS (media="all") -->
+<link rel="stylesheet" href="css/style.css">
+<!-- HTML5 old IE enabling script -->
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<!-- CSS -->
+<style>
+body{margin:0; padding:0; background:#fff;}
+#navigationMenu{position:fixed; top:10px; left:10px; border:1px solid #666; padding:5px; background:#fff;}
+.is-touch-device #navigationMenu{position:absolute;}
+#navigationMenu ul{overflow:hidden; margin:0; padding:0; list-style-type:none;}
+#navigationMenu ul li{float:left; margin:2px 10px;}
+.content{min-height:1000px; margin:0 0 60px 0; background:#ddd; padding:60px 26px;}
+.content:nth-child(odd){background:#eee;}
+</style>
+</head>
+
+<body id="top">
+	<div id="page">
+		<nav id="navigationMenu">
+			<ul>
+				<li><a href="#section_1">Section 1</a></li>
+				<li><a href="#section_2">Section 2</a></li>
+				<li><a href="#section_3">Section 3</a></li>
+				<li><a href="#section_4">Section 4</a></li>
+				<li><a href="#section_5">Section 5</a></li>
+			</ul>
+		</nav>
+		<section id="section_1" class="content">
+			<h2>Section 1</h2>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+		</section>
+		<section id="section_2" class="content">
+			<h2>Section 2</h2>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <hr /><a href="#top">Back to top</a></p>
+		</section>
+		<section id="section_3" class="content">
+			<h2>Section 3</h2>
+			<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. <hr /><a href="#section_4" rel="m_PageScroll2id">Next section</a> | <a href="#top">Back to top</a></p>
+		</section>
+		<section id="section_4" class="content">
+			<h2>Section 4</h2>
+			<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. <hr /><a href="#section_2" rel="m_PageScroll2id">Check section 2</a> | <a href="#top">Back to top</a></p>
+		</section>
+		<section id="section_5" class="content">
+			<h2>Section 5</h2>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. <hr /><a href="#section_4" rel="m_PageScroll2id">Previous section</a> | <a href="#top">Back to top</a></p>
+		</section>
+	</div>
+	<!-- Get Google CDN's jQuery and jQuery UI -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<script src="jquery.malihu.PageScroll2id.js"></script>
+	<script src="jquery.address-1.4.min.js"></script>
+	<script>
+		jQuery.noConflict();
+		(function($){
+			/* functions to run when content loads */
+			$(window).load(function(){
+				//with jquery address
+				$("#navigationMenu a,a[href='#top'],a[rel='m_PageScroll2id']").mPageScroll2id().address();
+				$.address.externalChange(function(event){ 
+					if(event.value){
+						var eVal=event.value.replace("/","");
+						if(eVal===""){
+							eVal="top";
+						}
+						//calling "history" method of mPageScroll2id and pass jquery address value
+						$().mPageScroll2id("history",{
+							scrollTo:eVal
+						});
+					}
+				});
+			});
+		})(jQuery);
+	</script>
+</body>
+</html>
