@@ -5,7 +5,7 @@
 <!-- Google Chrome Frame -->
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <!-- Reset iPhone Viewport & Initial Scale -->
-<meta name="viewport" content="width=device-width; initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Animate page to id with jquery - plugin demo</title>
 <!-- CSS (media="all") -->
 <link rel="stylesheet" href="css/style.css">
@@ -29,11 +29,11 @@ body{margin:0; padding:0; background:#fff;}
 	<div id="page">
 		<nav id="navigationMenu">
 			<ul>
-				<li><a href="#section_1">Section 1</a></li>
-				<li><a href="#section_2">Section 2</a></li>
-				<li><a href="#section_3">Section 3</a></li>
-				<li><a href="#section_4">Section 4</a></li>
-				<li><a href="#section_5">Section 5</a></li>
+				<li><a href="#section_1" rel="_pageScroll">Section 1</a></li>
+				<li><a href="#section_2" rel="_pageScroll">Section 2</a></li>
+				<li><a href="#section_3" rel="_pageScroll">Section 3</a></li>
+				<li><a href="#section_4" rel="_pageScroll">Section 4</a></li>
+				<li><a href="#section_5" rel="_pageScroll">Section 5</a></li>
 				<li><a href="#" rel="add-content">+ Add new section</a></li>
 			</ul>
 		</nav>
@@ -61,21 +61,21 @@ body{margin:0; padding:0; background:#fff;}
 		</section>
 	</div>
 	<!-- Get Google CDN's jQuery and jQuery UI -->
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
 	<script src="jquery.malihu.PageScroll2id.js"></script>
 	<script>
 		jQuery.noConflict();
 		(function($){
 			/* functions to run when content loads */
 			$(window).load(function(){
-				$("#navigationMenu a,a[href='#top'],a[rel='_pageScroll']").mPageScroll2id();
+				$("a[href='#top'],a[rel='_pageScroll']").mPageScroll2id();
 				//test with dynamically loaded content
 				$("#navigationMenu a[rel='add-content']").click(function(e){
 					e.preventDefault();
 					if($("#section_6").length===0){
 						var newSection="<section id='section_6' class='content'><h2>Section 6</h2><p>This is a newly added section...</p></section>";
-						$(this).parent().html("<a href='#section_6'>Section 6</a>");
+						$(this).parent().html("<a href='#section_6' rel='_pageScroll'>Section 6</a>");
 						$("#page").append(newSection);
 					}
 				});

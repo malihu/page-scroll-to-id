@@ -21,7 +21,7 @@
 			}
 			//store options, global animation state
 			$(document).data("mPageScroll2id-scrollElem",scrollElem).data("mPageScroll2id-layout",options.layout).data("mPageScroll2id-pageEndSmoothScroll",options.pageEndSmoothScroll).data("mPageScroll2id-speed",options.scrollSpeed).data("mPageScroll2id-easing",options.scrollEasing).data("mPageScroll2id-animation","idle"); 
-			return this["live"]("click",function(e){
+			return $("body")["delegate"](this.selector,"click",function(e){
 				e.preventDefault();
 				var $this=$(this);
 				var scrollTarget=$this.attr("href").split("#");
