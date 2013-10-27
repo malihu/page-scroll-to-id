@@ -25,13 +25,14 @@
 				e.preventDefault();
 				var $this=$(this);
 				var scrollTarget=$this.attr("href").split("#");
-				var scrollToPos=$("#"+scrollTarget[1]).offset().top;
+				var scrollTargetElement = $("#"+scrollTarget[1]);
+				var scrollToPos=scrollTargetElement.offset().top;
 				var docHeight=$(document).height();
 				if(options.layout==="horizontal"){ //x-axis
-					scrollToPos=$("#"+scrollTarget[1]).offset().left; 
+					scrollToPos=scrollTargetElement.offset().left; 
 					var docWidth=$(document).width(); 
 				}else if(options.layout==="auto"){ //xy-axis
-					var scrollToPosX=$("#"+scrollTarget[1]).offset().left; 
+					var scrollToPosX=scrollTargetElement.offset().left; 
 					var docWidth=$(document).width(); 
 					var scrollToX=scrollToPosX;
 				}
@@ -72,7 +73,7 @@
 					scrollTo:scrollTo,
 					speed:speed,
 					easing:easing,
-					callback:options.callback,
+					callback:$.proxy(options.callback, scrollTargetElement, e),
 					layout:options.layout,
 					scrollToX:scrollToX //xy-axis
 				});
