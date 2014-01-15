@@ -22,8 +22,8 @@
   },
   "licenses": [
     {
-      "type": "GNU LGPL",
-      "url": "http://www.gnu.org/licenses/lgpl.html"
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
     }
   ],
   "dependencies": {

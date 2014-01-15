@@ -1,24 +1,32 @@
 /*
 == Page scroll to id == 
-Version: 1.5.0 
+Version: 1.5.1 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
+License: MIT License (MIT)
 */
 
 /*
-This program is free software: you can redistribute it and/or modify 
-it under the terms of the GNU Lesser General Public License as published by 
-the Free Software Foundation, either version 3 of the License, or 
-any later version. 
+Copyright 2013  malihu  (email: manos@malihu.gr)
 
-This program is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-GNU Lesser General Public License for more details. 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-You should have received a copy of the GNU Lesser General Public License 
-along with this program.  If not, see http://www.gnu.org/licenses/lgpl.html. 
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 */
 
 ;(function($,window,document,undefined){
@@ -70,7 +78,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/lgpl.html.
 	
 	/* vars, constants */
 	
-		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,
+		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,
 	
 	/* 
 	---------------
@@ -116,6 +124,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/lgpl.html.
 							return;
 						}
 						functions._reset.call(null);
+						_dataOffset=$this.data("ps2id-offset") || 0;
 						if(functions._isValid.call(null,href,hrefProp) && functions._findTarget.call(null,href)){
 							e.preventDefault();
 							_trigger="selector";
@@ -246,13 +255,62 @@ along with this program.  If not, see http://www.gnu.org/licenses/lgpl.html.
 				if(!_axis){
 					_axis=opt.layout;
 				}
-				if(!_offset){
-					_offset=(opt.offset) ? opt.offset : 0;
-				}
-				_to=[(el.offset().top-parseInt(_offset)).toString(),(el.offset().left-parseInt(_offset)).toString()];
+				_offset=functions._setOffset.call(null);
+				_to=[(el.offset().top-_offset[0]).toString(),(el.offset().left-_offset[1]).toString()]; 
 				_to[0]=(_to[0]<0) ? 0 : _to[0];
 				_to[1]=(_to[1]<0) ? 0 : _to[1];
 				return _to;
+			},
+			
+			/* sets the offset value (pixels, objects etc.) */
+			
+			_setOffset:function(){
+				if(!_offset){
+					_offset=(opt.offset) ? opt.offset : 0;
+				}
+				if(_dataOffset){
+					_offset=_dataOffset;
+				}
+				var val,obj,y,x;
+				switch(typeof _offset){
+					case "object":
+					case "string":
+						val=[(_offset["y"]) ? _offset["y"] : _offset,(_offset["x"]) ? _offset["x"] : _offset];
+						obj=[(val[0] instanceof jQuery) ? val[0] : $(val[0]),(val[1] instanceof jQuery) ? val[1] : $(val[1])];
+						if(obj[0].length>0){ // js/jquery object
+							y=obj[0].height();
+							if(obj[0].css("position")==="fixed"){ // include position for fixed elements
+								y+=obj[0][0].offsetTop;
+							}
+						}else if(!isNaN(parseFloat(val[0])) && isFinite(val[0])){ // numeric string
+							y=parseInt(val[0]);
+						}else{
+							y=0; // non-existing value
+						}
+						if(obj[1].length>0){ // js/jquery object
+							x=obj[1].width();
+							if(obj[1].css("position")==="fixed"){ // include position for fixed elements
+								x+=obj[1][0].offsetLeft;
+							}
+						}else if(!isNaN(parseFloat(val[1])) && isFinite(val[1])){ // numeric string
+							x=parseInt(val[1]);
+						}else{
+							x=0; // non-existing value
+						}
+						break;
+					case "function":
+						val=_offset.call(null); // function (single value or array)
+						if(val instanceof Array){
+							y=val[0];
+							x=val[1];
+						}else{
+							y=x=val;
+						}
+						break;
+					default:
+						y=x=parseInt(_offset); // number
+				}
+				return [y,x];
 			},
 			
 			/* finds the element that should be highlighted */
@@ -337,7 +395,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/lgpl.html.
 					case "auto":
 						if(_t!=_to[0] || _l!=_to[1]){
 							functions._callbacks.call(null,"onStart");
-							if(navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)){ //mobile fix
+							if(navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)){ // mobile fix
 								var left;
 								el.stop().animate({pageYOffset:_to[0],pageXOffset:_to[1]},{
 								    duration:speed,
@@ -411,7 +469,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/lgpl.html.
 			/* resets/clears vars and constants */
 			
 			_reset:function(){
-				_axis=_offset=false;
+				_axis=_offset=_dataOffset=false;
 			},
 			
 			/* checks if plugin has initialized */

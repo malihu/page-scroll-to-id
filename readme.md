@@ -8,7 +8,8 @@ The plugin replaces the default browser behaviour of "jumping" to page sections 
 * Advanced animation easings 
 * Vertical and/or horizontal scrolling 
 * Links and targets highlighting via ready-to-use classes 
-* Auto-adjustable Scroll-to position and user defined offset 
+* Auto-adjustable Scroll-to position 
+* Advanced scroll-to position offset (by pixels, by element selector, link specific offsets etc.) 
 
 #### Usage 
 
@@ -43,9 +44,6 @@ Plugin tested successfully on:
 License 
 -------------------------
 
-This program is free software: you can redistribute it and/or modify 
-it under the terms of the GNU Lesser General Public License as published by 
-the Free Software Foundation, either version 3 of the License, or 
-any later version. 
+MIT License (MIT)
 
-http://www.gnu.org/licenses/lgpl.html
+http://opensource.org/licenses/MIT
