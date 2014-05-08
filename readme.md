@@ -30,13 +30,11 @@ jQuery version **1.6.0** or higher
 Browser compatibility
 -------------------------
 
-Plugin tested successfully on: 
-
-* Internet Explorer 8, 9, 10, 11 
-* Firefox up to version 25
-* Chrome up to version 31
-* Opera up to version 17
-* Safari up to version 6 
+* Internet Explorer 8+ 
+* Firefox 3.5+
+* Chrome 
+* Opera 
+* Safari 4+ 
 * iOS 
 * Android 
 * Windows Phone
