@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.1 
+Version: 1.5.2 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -67,6 +67,10 @@ THE SOFTWARE.
 			highlightClass:pluginPfx+"-highlight",
 			/* force a single highlighted element each time: Boolean */
 			forceSingleHighlight:false,
+			/* keep element highlighted until next (one element always stays highlighted): boolean */
+			keepHighlightUntilNext:false,
+			/* disable plugin below [x,y] screen size: boolean, integer, array ([x,y]) */
+			disablePluginBelow:false,
 			/* enable/disable click events for all selectors */
 			clickEvents:true,
 			/* user callback functions: fn */
@@ -117,6 +121,10 @@ THE SOFTWARE.
 					.undelegate("."+pluginPfx)
 					
 					.delegate(selector,"click."+pluginPfx,function(e){
+						if(functions._isDisabled.call(null)){
+							functions._removeClasses.call(null);
+							return;
+						}
 						var $this=$(this),
 							href=$this.attr("href"),
 							hrefProp=$this.prop("href");
@@ -140,11 +148,16 @@ THE SOFTWARE.
 				.unbind("."+pluginPfx)
 				
 				.bind("scroll."+pluginPfx+" resize."+pluginPfx,function(){
+					if(functions._isDisabled.call(null)){
+						functions._removeClasses.call(null);
+						return;
+					}
 					var targets=$("._"+pluginPfx+"-t");
-					targets.each(function(){
+					targets.each(function(i){
 						var t=$(this),id=t.attr("id"),
 							h=functions._findHighlight.call(null,id);
 						functions._setClasses.call(null,false,t,h);
+						if(i==targets.length-1){functions._extendClasses.call(null);}
 					});
 				});
 				
@@ -160,6 +173,10 @@ THE SOFTWARE.
 			/* scrollTo method */
 			
 			scrollTo:function(id,options){
+				if(functions._isDisabled.call(null)){
+					functions._removeClasses.call(null);
+					return;
+				}
 				if(id && typeof id!=="undefined"){
 					functions._isInit.call(null);
 					var defaults={
@@ -188,11 +205,8 @@ THE SOFTWARE.
 			destroy:function(){
 				$(window).unbind("."+pluginPfx);
 				$(document).undelegate("."+pluginPfx).removeData(pluginPfx);
-				$("."+opt.clickedClass).removeClass(opt.clickedClass);
-				$("."+opt.targetClass).removeClass(opt.targetClass);
-				$("."+opt.highlightClass).removeClass(opt.highlightClass);
-				$("._"+pluginPfx+"-t").removeData(pluginPfx).removeClass("_"+pluginPfx+"-t");
-				$("._"+pluginPfx+"-h").removeClass("_"+pluginPfx+"-h");
+				$("._"+pluginPfx+"-t").removeData(pluginPfx);
+				functions._removeClasses.call(null,true);
 			}
 		},
 	
@@ -203,6 +217,18 @@ THE SOFTWARE.
 	*/
 	
 		functions={
+			
+			/* checks if screen size ([x,y]) is below the value(s) set in disablePluginBelow option */
+			
+			_isDisabled:function(){
+				var e=window,a="inner",
+					val=opt.disablePluginBelow instanceof Array ? [opt.disablePluginBelow[0] || 0,opt.disablePluginBelow[1] || 0] : [opt.disablePluginBelow || 0,0];
+				if(!("innerWidth" in window )){
+					a="client";
+					e=document.documentElement || document.body;
+				}
+				return e[a+"Width"]<=val[0] || e[a+"Height"]<=val[1];
+			},
 			
 			/* checks if href attribute is valid */
 			
@@ -234,6 +260,7 @@ THE SOFTWARE.
 							var h=functions._findHighlight.call(null,id);
 							functions._setClasses.call(null,false,t,h);
 							i++
+							if(i==$(el).length){functions._extendClasses.call(null);}
 						}
 					}
 				});
@@ -335,15 +362,45 @@ THE SOFTWARE.
 					_clicked.addClass(cc);
 				}else if(t && tc && tc!=="" && h && hc && hc!==""){
 					if(functions._currentTarget.call(null,t)){
-						if(opt.forceSingleHighlight){
-							$("."+hc).removeClass(hc);
-						}
 						t.addClass(tc);
 						h.addClass(hc);
 					}else{
-						t.removeClass(tc);
-						h.removeClass(hc);
+						if(!opt.keepHighlightUntilNext || $("."+hc).length>1){
+							t.removeClass(tc);
+							h.removeClass(hc);
+						}
 					}
+				}
+			},
+			
+			/* extends plugin classes */
+			
+			_extendClasses:function(){
+				var tc=opt.targetClass,hc=opt.highlightClass,
+					$tc=$("."+tc),$hc=$("."+hc),ftc=tc+"-first",ltc=tc+"-last",fhc=hc+"-first",lhc=hc+"-last";
+				$("._"+pluginPfx+"-t").removeClass(ftc+" "+ltc);
+				$("._"+pluginPfx+"-h").removeClass(fhc+" "+lhc);
+				if(!opt.forceSingleHighlight){
+					$tc.slice(0,1).addClass(ftc).end().slice(-1).addClass(ltc);
+					$hc.slice(0,1).addClass(fhc).end().slice(-1).addClass(lhc);
+				}else{
+					if(opt.keepHighlightUntilNext && $tc.length>1){
+						$tc.slice(0,1).removeClass(tc); $hc.slice(0,1).removeClass(hc);
+					}else{
+						$tc.slice(1).removeClass(tc); $hc.slice(1).removeClass(hc);
+					}
+				}
+			},
+			
+			/* removes plugin classes */
+			
+			_removeClasses:function(destroy){
+				$("."+opt.clickedClass).removeClass(opt.clickedClass);
+				$("."+opt.targetClass).removeClass(opt.targetClass+" "+opt.targetClass+"-first "+opt.targetClass+"-last");
+				$("."+opt.highlightClass).removeClass(opt.highlightClass+" "+opt.highlightClass+"-first "+opt.highlightClass+"-last");
+				if(destroy){
+					$("._"+pluginPfx+"-t").removeClass("_"+pluginPfx+"-t");
+					$("._"+pluginPfx+"-h").removeClass("_"+pluginPfx+"-h");
 				}
 			},
 			
