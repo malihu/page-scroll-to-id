@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.2 
+Version: 1.5.3 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -69,6 +69,8 @@ THE SOFTWARE.
 			forceSingleHighlight:false,
 			/* keep element highlighted until next (one element always stays highlighted): boolean */
 			keepHighlightUntilNext:false,
+			/* highlight elements according to their target and next target position (useful when targets have zero dimensions). Non "auto" layouts only: boolean */
+			highlightByNextTarget:false,
 			/* disable plugin below [x,y] screen size: boolean, integer, array ([x,y]) */
 			disablePluginBelow:false,
 			/* enable/disable click events for all selectors */
@@ -77,12 +79,14 @@ THE SOFTWARE.
 			onStart:function(){},
 			onComplete:function(){},
 			/* enable/disable the default selector: Boolean */
-			defaultSelector:false
+			defaultSelector:false,
+			/* highlight elements now and in the future */
+			live:true
 		},
 	
 	/* vars, constants */
 	
-		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,
+		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,_totalInstances=0,_liveTimer,
 	
 	/* 
 	---------------
@@ -168,6 +172,13 @@ THE SOFTWARE.
 				/* setup selectors, target elements, basic plugin classes etc. */
 				
 				functions._setup.call(null);
+				
+				/* 
+				monitor for elements matching the current highlight selector and call plugin setup when found (now and in the future) 
+				to manually enable/disable: $(document).data("mPS2id").live=boolean 
+				*/
+				
+				functions._live.call(null);
 			},
 			
 			/* scrollTo method */
@@ -245,25 +256,39 @@ THE SOFTWARE.
 			/* setup selectors, target elements, basic plugin classes etc. */
 			
 			_setup:function(){
-				var el=(opt.highlightSelector && opt.highlightSelector!=="") ? opt.highlightSelector : selector,i=1;
+				var el=functions._highlightSelector(),i=1,tp=0;
 				return $(el).each(function(){
 					var $this=$(this),href=$this.attr("href"),hrefProp=$this.prop("href");
 					if(functions._isValid.call(null,href,hrefProp)){
 						var id=(href.indexOf("#/")!==-1) ? href.split("#/")[1] : href.split("#")[1],t=$("#"+id); 
 						if(t.length>0){
-							if(!t.hasClass("_"+pluginPfx+"-t")){
-								t.addClass("_"+pluginPfx+"-t").data(pluginPfx,{i:i});
+							if(opt.highlightByNextTarget){
+								if(t!==tp){
+									if(!tp){t.data(pluginPfx,{tn:"0"});}else{tp.data(pluginPfx,{tn:t});}
+									tp=t;
+								}
 							}
+							if(!t.hasClass("_"+pluginPfx+"-t")){
+								t.addClass("_"+pluginPfx+"-t");
+							}
+							t.data(pluginPfx,{i:i});
 							if(!$this.hasClass("_"+pluginPfx+"-h")){
 								$this.addClass("_"+pluginPfx+"-h");
 							}
 							var h=functions._findHighlight.call(null,id);
 							functions._setClasses.call(null,false,t,h);
+							_totalInstances=i;
 							i++
 							if(i==$(el).length){functions._extendClasses.call(null);}
 						}
 					}
 				});
+			},
+			
+			/* returns the highlight selector */
+			
+			_highlightSelector:function(){
+				return (opt.highlightSelector && opt.highlightSelector!=="") ? opt.highlightSelector : selector;
 			},
 			
 			/* finds the target element */
@@ -408,7 +433,8 @@ THE SOFTWARE.
 			
 			_currentTarget:function(t){
 				var o=opt["target_"+t.data(pluginPfx).i],
-					rect=t[0].getBoundingClientRect();
+					dataTarget=t.data("ps2id-target"),
+					rect=dataTarget ? $(dataTarget)[0].getBoundingClientRect() : t[0].getBoundingClientRect();
 				if(typeof o!=="undefined"){
 					var y=t.offset().top,x=t.offset().left,
 						from=(o.from) ? o.from+y : y,to=(o.to) ? o.to+y : y,
@@ -419,15 +445,24 @@ THE SOFTWARE.
 					);
 				}else{
 					var wh=$(window).height(),ww=$(window).width(),
-						th=t.height(),tw=t.width(),
+						th=dataTarget ? $(dataTarget).height() : t.height(),tw=dataTarget ? $(dataTarget).width() : t.width(),
 						base=1+(th/wh),
 						top=base,bottom=(th<wh) ? base*(wh/th) : base,
 						baseX=1+(tw/ww),
-						left=baseX,right=(tw<ww) ? baseX*(ww/tw) : baseX;
-					return(
-						rect.top <= wh/top && rect.bottom >= wh/bottom && 
-						rect.left <= ww/left && rect.right >= ww/right
-					);
+						left=baseX,right=(tw<ww) ? baseX*(ww/tw) : baseX,
+						val=[rect.top <= wh/top,rect.bottom >= wh/bottom,rect.left <= ww/left,rect.right >= ww/right];
+					if(opt.highlightByNextTarget){
+						var tn=t.data(pluginPfx).tn;
+						if(tn){
+							var rectn=tn[0].getBoundingClientRect();
+							if(opt.layout==="vertical"){
+								val=[rect.top <= wh/2,rectn.top > wh/2,1,1];
+							}else if(opt.layout==="horizontal"){
+								val=[1,1,rect.left <= ww/2,rectn.left > ww/2];
+							}
+						}
+					}
+					return(val[0] && val[1] && val[2] && val[3]);
 				}
 			},
 			
@@ -535,6 +570,21 @@ THE SOFTWARE.
 				if(!_init){
 					methods.init.apply(this);
 				}
+			},
+			
+			/* live fn */
+			
+			_live:function(){
+				_liveTimer=setTimeout(function(){
+					if(opt.live){
+						if($(functions._highlightSelector()).length!==_totalInstances){
+							functions._setup.call(null);
+						}
+					}else{
+						if(_liveTimer){clearTimeout(_liveTimer);}
+					}
+					functions._live.call(null);
+				},1000);
 			},
 			
 			/* extends jquery with custom easings (as jquery ui) */
