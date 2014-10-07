@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.3 
+Version: 1.5.4 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -35,7 +35,7 @@ THE SOFTWARE.
 	
 	var pluginNS="mPageScroll2id",
 		pluginPfx="mPS2id",
-		defaultSelector=".m_PageScroll2id,a[rel~='m_PageScroll2id'],.page-scroll-to-id,a[rel~='page-scroll-to-id']",
+		defaultSelector=".m_PageScroll2id,a[rel~='m_PageScroll2id'],.page-scroll-to-id,a[rel~='page-scroll-to-id'],._ps2id",
 	
 	/* default options */
 	
@@ -107,8 +107,20 @@ THE SOFTWARE.
 				$(document).data(pluginPfx,options);
 				opt=$(document).data(pluginPfx);
 				
-				/* set default selector */
-						
+				/* check/set jquery (deprecated) selector property if not defined */
+				if(!this.selector){
+					var selectorClass="__"+pluginPfx;
+					this.each(function(){
+						var el=$(this);
+						if(!el.hasClass(selectorClass)){
+							el.addClass(selectorClass);
+						}
+					});
+					this.selector="."+selectorClass;
+				}
+				
+				/* set selector */
+				
 				selector=(!selector) ? this.selector : selector+","+this.selector;
 				
 				if(opt.defaultSelector){

@@ -97,8 +97,9 @@
 		<p>Page Scroll to id - jQuery plugin by <a href="http://manos.malihu.gr">malihu</a>. Plugin homepage: <a href="http://manos.malihu.gr/page-scroll-to-id">http://manos.malihu.gr/page-scroll-to-id</a>.</p>
 	</footer>
 	
-	<!-- Google CDN jQuery -->
+	<!-- Google CDN jQuery with fallback to local -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="js/jquery-1.10.2.min.js"><\/script>')</script>
 	
 	<!-- jquery.address plugin CDN -->
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.address/1.6/jquery.address.min.js"></script>
@@ -126,6 +127,13 @@
 				
 				$("#navigation-menu a,a[href='#top'],a[rel='m_PageScroll2id']").click(function(e) {
                     e.preventDefault();
+                    var href=$(this).attr("href");
+                    if($.address.value()==="/"+href){
+                    	$.address.history(false); 
+                    	$.address.value("#");
+                    }else{
+                    	$.address.history(true); 
+                    }
 					$.address.value($(this).attr("href"));
                 });
 				
