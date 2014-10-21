@@ -11,13 +11,13 @@ The plugin replaces the default browser behaviour of "jumping" to page sections 
 * Auto-adjustable Scroll-to position 
 * Advanced scroll-to position offset (by pixels, by element selector, link specific offsets etc.) 
 
+#### Installation
+
+Bower: `bower install page-scroll-to-id` 
+
 #### Usage 
 
 `$("a[href*='#']").mPageScroll2id();` 
-
-#### Bower
-
-`bower install page-scroll-to-id` 
 
 #### For more information 
 
@@ -49,3 +49,8 @@ License
 MIT License (MIT)
 
 http://opensource.org/licenses/MIT
+
+Donate 
+-------------------------
+
+https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UYJ5G65M6ZA28
