@@ -15,6 +15,8 @@ The plugin replaces the default browser behaviour of "jumping" to page sections 
 
 Bower: `bower install page-scroll-to-id` 
 
+npm: `npm install page-scroll-to-id` 
+
 #### Usage 
 
 `$("a[href*='#']").mPageScroll2id();` 
