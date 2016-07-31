@@ -63,18 +63,20 @@
 	</footer>
 	
 	<!-- Google CDN jQuery -->
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	
 	<!-- Page Scroll to id plugin -->
 	<script src="../jquery.malihu.PageScroll2id.js"></script>
 	
 	<script>
 		(function($){
-			$(window).load(function(){
+			$(window).on("load",function(){
 				
 				/* Page Scroll to id fn call */
+				/* In jQuery 3+ you need to define your live elements in the liveSelector option or add the class __mPS2id to the dynamic element(s) */
 				$("a[href='#top'],a[rel='m_PageScroll2id']").mPageScroll2id({
-					highlightSelector:"#navigation-menu a[rel='m_PageScroll2id']"
+					highlightSelector:"#navigation-menu a[rel='m_PageScroll2id']",
+					liveSelector:"#navigation-menu a[rel='m_PageScroll2id']"
 				});
 				
 				/* demo functions */

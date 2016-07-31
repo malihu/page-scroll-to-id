@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.4 
+Version: 1.5.5 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -81,7 +81,9 @@ THE SOFTWARE.
 			/* enable/disable the default selector: Boolean */
 			defaultSelector:false,
 			/* highlight elements now and in the future */
-			live:true
+			live:true,
+			/* set specific live selector(s): String */
+			liveSelector:false
 		},
 	
 	/* vars, constants */
@@ -118,6 +120,10 @@ THE SOFTWARE.
 					});
 					this.selector="."+selectorClass;
 				}
+				
+				/* live selector */
+				
+				if(opt.liveSelector) this.selector+=","+opt.liveSelector;
 				
 				/* set selector */
 				
@@ -602,123 +608,106 @@ THE SOFTWARE.
 			/* extends jquery with custom easings (as jquery ui) */
 			
 			_easing:function(){
-				$.easing.easeInQuad=$.easing.easeInQuad || 
-					function(x,t,b,c,d){return c*(t/=d)*t + b;};	
-				$.easing.easeOutQuad=$.easing.easeOutQuad || 
-					function(x,t,b,c,d){return -c *(t/=d)*(t-2) + b;};
-				$.easing.easeInOutQuad=$.easing.easeInOutQuad || 
-					function(x,t,b,c,d){
-						if ((t/=d/2) < 1) return c/2*t*t + b;
-						return -c/2 * ((--t)*(t-2) - 1) + b;
-					};
-				$.easing.easeInCubic=$.easing.easeInCubic || 
-					function(x,t,b,c,d){return c*(t/=d)*t*t + b;};
-				$.easing.easeOutCubic=$.easing.easeOutCubic || 
-					function(x,t,b,c,d){return c*((t=t/d-1)*t*t + 1) + b;};
-				$.easing.easeInOutCubic=$.easing.easeInOutCubic || 
-					function(x,t,b,c,d){
-						if ((t/=d/2) < 1) return c/2*t*t*t + b;
-						return c/2*((t-=2)*t*t + 2) + b;
-					};
-				$.easing.easeInQuart=$.easing.easeInQuart || 
-					function(x,t,b,c,d){return c*(t/=d)*t*t*t + b;};
-				$.easing.easeOutQuart=$.easing.easeOutQuart || 
-					function(x,t,b,c,d){return -c * ((t=t/d-1)*t*t*t - 1) + b;};
-				$.easing.easeInOutQuart=$.easing.easeInOutQuart || 
-					function(x,t,b,c,d){
-						if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-						return -c/2 * ((t-=2)*t*t*t - 2) + b;
-					};
-				$.easing.easeInQuint=$.easing.easeInQuint || 
-					function(x,t,b,c,d){return c*(t/=d)*t*t*t*t + b;};
-				$.easing.easeOutQuint=$.easing.easeOutQuint || 
-					function(x,t,b,c,d){return c*((t=t/d-1)*t*t*t*t + 1) + b;};
-				$.easing.easeInOutQuint=$.easing.easeInOutQuint || 
-					function(x,t,b,c,d){
-						if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-						return c/2*((t-=2)*t*t*t*t + 2) + b;
-					};
-				$.easing.easeInExpo=$.easing.easeInExpo || 
-					function(x,t,b,c,d){return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;};
-				$.easing.easeOutExpo=$.easing.easeOutExpo || 
-					function(x,t,b,c,d){return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;};
-				$.easing.easeInOutExpo=$.easing.easeInOutExpo || 
-					function(x,t,b,c,d){
-						if (t==0) return b;
-						if (t==d) return b+c;
-						if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
-						return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
-					};
-				$.easing.easeInSine=$.easing.easeInSine || 
-					function(x,t,b,c,d){return -c * Math.cos(t/d * (Math.PI/2)) + c + b;};
-				$.easing.easeOutSine=$.easing.easeOutSine || 
-					function(x,t,b,c,d){return c * Math.sin(t/d * (Math.PI/2)) + b;};
-				$.easing.easeInOutSine=$.easing.easeInOutSine || 
-					function(x,t,b,c,d){return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;};
-				$.easing.easeInCirc=$.easing.easeInCirc || 
-					function(x,t,b,c,d){return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;};
-				$.easing.easeOutCirc=$.easing.easeOutCirc || 
-					function(x,t,b,c,d){return c * Math.sqrt(1 - (t=t/d-1)*t) + b;};
-				$.easing.easeInOutCirc=$.easing.easeInOutCirc || 
-					function(x,t,b,c,d){
-						if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
-						return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
-					};
-				$.easing.easeInElastic=$.easing.easeInElastic || 
-					function(x,t,b,c,d){
-						var s=1.70158;var p=0;var a=c;
-						if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-						if (a < Math.abs(c)) { a=c; var s=p/4; }
-						else var s = p/(2*Math.PI) * Math.asin (c/a);
-						return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-					};
-				$.easing.easeOutElastic=$.easing.easeOutElastic || 
-					function(x,t,b,c,d){
-						var s=1.70158;var p=0;var a=c;
-						if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-						if (a < Math.abs(c)) { a=c; var s=p/4; }
-						else var s = p/(2*Math.PI) * Math.asin (c/a);
-						return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
-					};
-				$.easing.easeInOutElastic=$.easing.easeInOutElastic || 
-					function(x,t,b,c,d){
-						var s=1.70158;var p=0;var a=c;
-						if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
-						if (a < Math.abs(c)) { a=c; var s=p/4; }
-						else var s = p/(2*Math.PI) * Math.asin (c/a);
-						if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-						return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
-					};
-				$.easing.easeInBack=$.easing.easeInBack || 
-					function(x,t,b,c,d,s){
-						if (s == undefined) s = 1.70158;
-						return c*(t/=d)*t*((s+1)*t - s) + b;
-					};
-				$.easing.easeOutBack=$.easing.easeOutBack || 
-					function(x,t,b,c,d,s){
-						if (s == undefined) s = 1.70158;
-						return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
-					};
-				$.easing.easeInOutBack=$.easing.easeInOutBack || 
-					function(x,t,b,c,d,s){
-						if (s == undefined) s = 1.70158;
-						if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
-						return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
-					};
-				$.easing.easeInBounce=$.easing.easeInBounce || 
-					function(x,t,b,c,d){return c - $.easing.easeOutBounce (x, d-t, 0, c, d) + b;};
-				$.easing.easeOutBounce=$.easing.easeOutBounce || 
-					function(x,t,b,c,d){
-						if ((t/=d) < (1/2.75)) {return c*(7.5625*t*t) + b;} 
-						else if (t < (2/2.75)) {return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;} 
-						else if (t < (2.5/2.75)) {return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;} 
-						else {return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;}
-					};
-				$.easing.easeInOutBounce=$.easing.easeInOutBounce || 
-					function(x,t,b,c,d){
-						if (t < d/2) return $.easing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
-						return $.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
-					};
+				$.easing.easeInQuad=$.easing.easeInQuad || function(x){
+					return x*x;
+				};
+				$.easing.easeOutQuad=$.easing.easeOutQuad || function(x){
+					return 1-(1-x)*(1-x);
+				};
+				$.easing.easeInOutQuad=$.easing.easeInOutQuad || function(x){
+					return x<0.5 ? 2*x*x : 1-Math.pow(-2*x+2,2)/2;
+				};
+				$.easing.easeInCubic=$.easing.easeInCubic || function(x){
+					return x*x*x;
+				};
+				$.easing.easeOutCubic=$.easing.easeOutCubic || function(x){
+					return 1-Math.pow(1-x,3);
+				};
+				$.easing.easeInOutCubic=$.easing.easeInOutCubic || function(x){
+					return x<0.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2;
+				};
+				$.easing.easeInQuart=$.easing.easeInQuart || function(x){
+					return x*x*x*x;
+				};
+				$.easing.easeOutQuart=$.easing.easeOutQuart || function(x){
+					return 1-Math.pow(1-x,4);
+				};
+				$.easing.easeInOutQuart=$.easing.easeInOutQuart || function(x){
+					return x<0.5 ? 8*x*x*x*x : 1-Math.pow(-2*x+2,4)/2;
+				};
+				$.easing.easeInQuint=$.easing.easeInQuint || function(x){
+					return x*x*x*x*x;
+				};
+				$.easing.easeOutQuint=$.easing.easeOutQuint || function(x){
+					return 1-Math.pow(1-x,5);
+				};
+				$.easing.easeInOutQuint=$.easing.easeInOutQuint || function(x){
+					return x<0.5 ? 16*x*x*x*x*x : 1-Math.pow(-2*x+2,5)/2;
+				};
+				$.easing.easeInExpo=$.easing.easeInExpo || function(x){
+					return x===0 ? 0 : Math.pow(2,10*x-10);
+				};
+				$.easing.easeOutExpo=$.easing.easeOutExpo || function(x){
+					return x===1 ? 1 : 1-Math.pow(2,-10*x);
+				};
+				$.easing.easeInOutExpo=$.easing.easeInOutExpo || function(x){
+					return x===0 ? 0 : x===1 ? 1 : x<0.5 ? Math.pow(2,20*x-10)/2 : (2-Math.pow(2,-20*x+10))/2;
+				};
+				$.easing.easeInSine=$.easing.easeInSine || function(x){
+					return 1-Math.cos(x*Math.PI/2);
+				};
+				$.easing.easeOutSine=$.easing.easeOutSine || function(x){
+					return Math.sin(x*Math.PI/2);
+				};
+				$.easing.easeInOutSine=$.easing.easeInOutSine || function(x){
+					return -(Math.cos(Math.PI*x)-1)/2;
+				};
+				$.easing.easeInCirc=$.easing.easeInCirc || function(x){
+					return 1-Math.sqrt(1-Math.pow(x,2));
+				};
+				$.easing.easeOutCirc=$.easing.easeOutCirc || function(x){
+					return Math.sqrt(1-Math.pow(x-1,2));
+				};
+				$.easing.easeInOutCirc=$.easing.easeInOutCirc || function(x){
+					return x<0.5 ? (1-Math.sqrt(1-Math.pow(2*x,2)))/2 : (Math.sqrt(1-Math.pow(-2*x+2,2))+1)/2;
+				};
+				$.easing.easeInElastic=$.easing.easeInElastic || function(x){
+					return x===0 ? 0 : x===1 ? 1 : -Math.pow(2,10*x-10)*Math.sin((x*10-10.75)*((2*Math.PI)/3));
+				};
+				$.easing.easeOutElastic=$.easing.easeOutElastic || function(x){
+					return x===0 ? 0 : x===1 ? 1 : Math.pow(2,-10*x)*Math.sin((x*10-0.75)*((2*Math.PI)/3))+1;
+				};
+				$.easing.easeInOutElastic=$.easing.easeInOutElastic || function(x){
+					return x===0 ? 0 : x===1 ? 1 : x<0.5 ? -(Math.pow(2,20*x-10)*Math.sin((20*x-11.125)*((2*Math.PI)/4.5)))/2 : Math.pow(2,-20*x+10)*Math.sin((20*x-11.125)*((2*Math.PI)/4.5))/2+1;
+				};
+				$.easing.easeInBack=$.easing.easeInBack || function(x){
+					return (1.70158+1)*x*x*x-1.70158*x*x;
+				};
+				$.easing.easeOutBack=$.easing.easeOutBack || function(x){
+					return 1+(1.70158+1)*Math.pow(x-1,3)+1.70158*Math.pow(x-1,2);
+				};
+				$.easing.easeInOutBack=$.easing.easeInOutBack || function(x){
+					return x<0.5 ? (Math.pow(2*x,2)*(((1.70158*1.525)+1)*2*x-(1.70158*1.525)))/2 : (Math.pow(2*x-2,2)*(((1.70158*1.525)+1)*(x*2-2)+(1.70158*1.525))+2)/2;
+				};
+				$.easing.easeInBounce=$.easing.easeInBounce || function(x){
+					return 1-__bounceOut(1-x);
+				};
+				$.easing.easeOutBounce=$.easing.easeOutBounce || __bounceOut;
+				$.easing.easeInOutBounce=$.easing.easeInOutBounce || function(x){
+					return x<0.5 ? (1-__bounceOut(1-2*x))/2 : (1+__bounceOut(2*x-1))/2;
+				};
+				function __bounceOut(x){
+					var n1=7.5625,d1=2.75;
+					if(x<1/d1){
+						return n1*x*x;
+					}else if(x<2/d1){
+						return n1*(x-=(1.5/d1))*x+.75;
+					}else if(x<2.5/d1){
+						return n1*(x-=(2.25/d1))*x+.9375;
+					}else{
+						return n1*(x-=(2.625/d1))*x+.984375;
+					}
+				}
 			}
 		}
 		
