@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.5 
+Version: 1.5.6 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -41,13 +41,13 @@ THE SOFTWARE.
 	
 		defaults={
 			/* scroll animation speed in milliseconds: Integer */
-			scrollSpeed:1300,
+			scrollSpeed:1000,
 			/* auto-adjust animation speed (according to target element position and window scroll): Boolean */
 			autoScrollSpeed:true,
 			/* scroll animation easing when page is idle: String */
-			scrollEasing:"easeInOutExpo",
+			scrollEasing:"easeInOutQuint",
 			/* scroll animation easing while page is scrolling: String */
-			scrollingEasing:"easeInOutCirc",
+			scrollingEasing:"easeOutQuint",
 			/* end of page "smooth scrolling" (auto-adjust the scroll-to position when bottom elements are too short): Boolean */
 			pageEndSmoothScroll:true,
 			/* 
@@ -75,6 +75,8 @@ THE SOFTWARE.
 			disablePluginBelow:false,
 			/* enable/disable click events for all selectors */
 			clickEvents:true,
+			/* append hash to URL/address bar */
+			appendHash:false,
 			/* user callback functions: fn */
 			onStart:function(){},
 			onComplete:function(){},
@@ -88,7 +90,7 @@ THE SOFTWARE.
 	
 	/* vars, constants */
 	
-		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,_totalInstances=0,_liveTimer,
+		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,_totalInstances=0,_liveTimer,_speed,_scrollable=$("html,body"),
 	
 	/* 
 	---------------
@@ -386,14 +388,8 @@ THE SOFTWARE.
 			/* finds the element that should be highlighted */
 			
 			_findHighlight:function(id){
-				var loc=window.location.toString().split("#")[0],
-					hHash=$("._"+pluginPfx+"-h[href='#"+id+"']"),
-					lhHash=$("._"+pluginPfx+"-h[href='"+loc+"#"+id+"']"),
-					hHashSlash=$("._"+pluginPfx+"-h[href='#/"+id+"']"),
-					lhHashSlash=$("._"+pluginPfx+"-h[href='"+loc+"#/"+id+"']");
-				hHash=(hHash.length>0) ? hHash : lhHash;
-				hHashSlash=(hHashSlash.length>0) ? hHashSlash : lhHashSlash;
-				return (hHashSlash.length>0) ? hHashSlash : hHash;
+				var wLoc=window.location,loc=wLoc.toString().split("#")[0],locPath=wLoc.pathname;
+				return $("._"+pluginPfx+"-h[href='#"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#"+id+"'],._"+pluginPfx+"-h[href='#/"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#/"+id+"']");
 			},
 			
 			/* sets plugin classes */
@@ -452,7 +448,7 @@ THE SOFTWARE.
 			_currentTarget:function(t){
 				var o=opt["target_"+t.data(pluginPfx).i],
 					dataTarget=t.data("ps2id-target"),
-					rect=dataTarget ? $(dataTarget)[0].getBoundingClientRect() : t[0].getBoundingClientRect();
+					rect=dataTarget && $(dataTarget)[0] ? $(dataTarget)[0].getBoundingClientRect() : t[0].getBoundingClientRect();
 				if(typeof o!=="undefined"){
 					var y=t.offset().top,x=t.offset().left,
 						from=(o.from) ? o.from+y : y,to=(o.to) ? o.to+y : y,
@@ -487,17 +483,16 @@ THE SOFTWARE.
 			/* scrolls the page */
 			
 			_scrollTo:function(){
-				opt.scrollSpeed=parseInt(opt.scrollSpeed);
+				_speed=functions._scrollSpeed.call(null);
 				_to=(opt.pageEndSmoothScroll) ? functions._pageEndSmoothScroll.call(null) : _to;
-				var el=$("html,body"),
-					speed=(opt.autoScrollSpeed) ? functions._autoScrollSpeed.call(null) : opt.scrollSpeed,
-					easing=(el.is(":animated")) ? opt.scrollingEasing : opt.scrollEasing,
+				var speed=(opt.autoScrollSpeed) ? functions._autoScrollSpeed.call(null) : _speed,
+					easing=(_scrollable.is(":animated")) ? opt.scrollingEasing : opt.scrollEasing,
 					_t=$(window).scrollTop(),_l=$(window).scrollLeft();
 				switch(_axis){
 					case "horizontal":
 						if(_l!=_to[1]){
 							functions._callbacks.call(null,"onStart");
-							el.stop().animate({scrollLeft:_to[1]},speed,easing).promise().then(function(){
+							_scrollable.stop().animate({scrollLeft:_to[1]},speed,easing).promise().then(function(){
 								functions._callbacks.call(null,"onComplete");
 							});
 						}
@@ -507,7 +502,7 @@ THE SOFTWARE.
 							functions._callbacks.call(null,"onStart");
 							if(navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)){ // mobile fix
 								var left;
-								el.stop().animate({pageYOffset:_to[0],pageXOffset:_to[1]},{
+								_scrollable.stop().animate({pageYOffset:_to[0],pageXOffset:_to[1]},{
 								    duration:speed,
 								    easing:easing,
 								    step:function(now,fx){
@@ -521,7 +516,7 @@ THE SOFTWARE.
 									functions._callbacks.call(null,"onComplete");
 								});
 							}else{
-								el.stop().animate({scrollTop:_to[0],scrollLeft:_to[1]},speed,easing).promise().then(function(){
+								_scrollable.stop().animate({scrollTop:_to[0],scrollLeft:_to[1]},speed,easing).promise().then(function(){
 									functions._callbacks.call(null,"onComplete");
 								});
 							}
@@ -530,7 +525,7 @@ THE SOFTWARE.
 					default:
 						if(_t!=_to[0]){
 							functions._callbacks.call(null,"onStart");
-							el.stop().animate({scrollTop:_to[0]},speed,easing).promise().then(function(){
+							_scrollable.stop().animate({scrollTop:_to[0]},speed,easing).promise().then(function(){
 								functions._callbacks.call(null,"onComplete");
 							});
 						}
@@ -545,14 +540,35 @@ THE SOFTWARE.
 				return [((_dh-_to[0])<_wh) ? _dh-_wh : _to[0],((_dw-_to[1])<_ww) ? _dw-_ww : _to[1]];
 			},
 			
+			/* sets animation speed (link-specific speed via ps2id-speed-VALUE class on link or link's parent) */
+			
+			_scrollSpeed:function(){
+				var customSpeedFrag="ps2id-speed-",speed=opt.scrollSpeed;
+				if(_clicked && _clicked.length){
+					_clicked.add(_clicked.parent()).each(function(){
+						var $this=$(this);
+						if($this.attr("class")){
+							var clickedClasses=$this.attr("class").split(" ");
+							for(var index in clickedClasses){
+								if(clickedClasses[index].match(/^ps2id-speed-\d+$/)){
+									speed=clickedClasses[index].split("ps2id-speed-")[1];
+									break;
+								}
+							}
+						}
+					});
+				}
+				return parseInt(speed);
+			},
+			
 			/* sets the auto-adjusted animation speed */
 			
 			_autoScrollSpeed:function(){
 				var _t=$(window).scrollTop(),_l=$(window).scrollLeft(),
 					_h=$(document).height(),_w=$(document).width(),
 					val=[
-						opt.scrollSpeed+((opt.scrollSpeed*(Math.floor((Math.abs(_to[0]-_t)/_h)*100)))/100),
-						opt.scrollSpeed+((opt.scrollSpeed*(Math.floor((Math.abs(_to[1]-_l)/_w)*100)))/100)
+						_speed+((_speed*(Math.floor((Math.abs(_to[0]-_t)/_h)*100)))/100),
+						_speed+((_speed*(Math.floor((Math.abs(_to[1]-_l)/_w)*100)))/100)
 					];
 				return Math.max.apply(Math,val);
 			},
@@ -568,6 +584,11 @@ THE SOFTWARE.
 				};
 				switch(c){
 					case "onStart":
+						//append hash to URL/address bar
+						if(opt.appendHash && window.history && window.history.pushState && _clicked && _clicked.length){
+							var h="#"+_clicked.attr("href").split("#")[1];
+							if(h!==window.location.hash) history.pushState("","",h);
+						}
 						opt.onStart.call(null,this[pluginPfx]);
 						break;
 					case "onComplete":

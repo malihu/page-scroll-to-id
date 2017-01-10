@@ -31,7 +31,7 @@ npm: `npm install page-scroll-to-id`
 Requirements
 -------------------------
 
-jQuery version **1.6.0** or higher
+jQuery version **1.7.0** or higher
 
 Browser compatibility
 -------------------------
