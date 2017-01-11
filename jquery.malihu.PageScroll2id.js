@@ -90,7 +90,7 @@ THE SOFTWARE.
 	
 	/* vars, constants */
 	
-		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,_totalInstances=0,_liveTimer,_speed,_scrollable=$("html,body"),
+		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,_totalInstances=0,_liveTimer,_speed,
 	
 	/* 
 	---------------
@@ -485,7 +485,8 @@ THE SOFTWARE.
 			_scrollTo:function(){
 				_speed=functions._scrollSpeed.call(null);
 				_to=(opt.pageEndSmoothScroll) ? functions._pageEndSmoothScroll.call(null) : _to;
-				var speed=(opt.autoScrollSpeed) ? functions._autoScrollSpeed.call(null) : _speed,
+				var _scrollable=$("html,body"),
+					speed=(opt.autoScrollSpeed) ? functions._autoScrollSpeed.call(null) : _speed,
 					easing=(_scrollable.is(":animated")) ? opt.scrollingEasing : opt.scrollEasing,
 					_t=$(window).scrollTop(),_l=$(window).scrollLeft();
 				switch(_axis){
