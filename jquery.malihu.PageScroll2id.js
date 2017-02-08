@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.6 
+Version: 1.5.7 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -544,14 +544,14 @@ THE SOFTWARE.
 			/* sets animation speed (link-specific speed via ps2id-speed-VALUE class on link or link's parent) */
 			
 			_scrollSpeed:function(){
-				var customSpeedFrag="ps2id-speed-",speed=opt.scrollSpeed;
+				var speed=opt.scrollSpeed;
 				if(_clicked && _clicked.length){
 					_clicked.add(_clicked.parent()).each(function(){
 						var $this=$(this);
 						if($this.attr("class")){
 							var clickedClasses=$this.attr("class").split(" ");
 							for(var index in clickedClasses){
-								if(clickedClasses[index].match(/^ps2id-speed-\d+$/)){
+								if(String(clickedClasses[index]).match(/^ps2id-speed-\d+$/)){
 									speed=clickedClasses[index].split("ps2id-speed-")[1];
 									break;
 								}
