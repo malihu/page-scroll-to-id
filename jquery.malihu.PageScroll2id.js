@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.8 
+Version: 1.5.9 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -151,7 +151,7 @@ THE SOFTWARE.
 						}
 						var $this=$(this),
 							href=$this.attr("href"),
-							hrefProp=$this.prop("href");
+							hrefProp=$this.prop("href").baseVal || $this.prop("href");
 						if(href && href.indexOf("#/")!==-1){
 							return;
 						}
@@ -278,7 +278,7 @@ THE SOFTWARE.
 			_setup:function(){
 				var el=functions._highlightSelector(),i=1,tp=0;
 				return $(el).each(function(){
-					var $this=$(this),href=$this.attr("href"),hrefProp=$this.prop("href");
+					var $this=$(this),href=$this.attr("href"),hrefProp=$this.prop("href").baseVal || $this.prop("href");
 					if(functions._isValid.call(null,href,hrefProp)){
 						var id=(href.indexOf("#/")!==-1) ? href.split("#/")[1] : href.split("#")[1],t=$("#"+id); 
 						if(t.length>0){
