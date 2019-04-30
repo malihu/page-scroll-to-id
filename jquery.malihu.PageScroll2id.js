@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.5.9 
+Version: 1.6.0 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -388,7 +388,7 @@ THE SOFTWARE.
 			/* finds the element that should be highlighted */
 			
 			_findHighlight:function(id){
-				var wLoc=window.location,loc=wLoc.toString().split("#")[0],locPath=wLoc.pathname;
+				var wLoc=window.location,loc=escape(wLoc.toString().split("#")[0]),locPath=escape(wLoc.pathname);
 				return $("._"+pluginPfx+"-h[href='#"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#"+id+"'],._"+pluginPfx+"-h[href='#/"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#/"+id+"']");
 			},
 			
