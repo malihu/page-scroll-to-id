@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.6.3 
+Version: 1.6.4 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -87,7 +87,9 @@ THE SOFTWARE.
 			/* set specific live selector(s): String */
 			liveSelector:false,
 			/* set specific selector(s) that will be excluded from being handled by the plugin: String */
-			excludeSelectors:false
+			excludeSelectors:false,
+			/* enable encodeURI for links (enable if your links have href values with UTF-8 encoding): boolean */
+			encodeLinks:false
 		},
 	
 	/* vars, constants */
@@ -402,7 +404,12 @@ THE SOFTWARE.
 				if(locPath.indexOf("'")!==-1) locPath=locPath.replace("'","\\'");
 				loc=decodeURIComponent(loc);
 				locPath=decodeURIComponent(locPath);
-				return $("._"+pluginPfx+"-h[href='#"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#"+id+"'],._"+pluginPfx+"-h[href='#/"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#/"+id+"']");
+				if(opt.encodeLinks){
+					var locEnc=encodeURI(loc).toLowerCase(),locPathEnc=encodeURI(locPath).toLowerCase();
+					return $("._"+pluginPfx+"-h[href='#"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#"+id+"'],._"+pluginPfx+"-h[href='#/"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locEnc+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locEnc+"#"+id+"'],._"+pluginPfx+"-h[href='"+locPathEnc+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locPathEnc+"#"+id+"']");
+				}else{
+					return $("._"+pluginPfx+"-h[href='#"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#"+id+"'],._"+pluginPfx+"-h[href='#/"+id+"'],._"+pluginPfx+"-h[href='"+loc+"#/"+id+"'],._"+pluginPfx+"-h[href='"+locPath+"#/"+id+"']");
+				}
 			},
 			
 			/* sets plugin classes */
