@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.6.4 
+Version: 1.6.5 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -276,7 +276,8 @@ THE SOFTWARE.
 				}
 				hrefProp=(!hrefProp) ? href : hrefProp;
 				var str=(hrefProp.indexOf("#/")!==-1) ? hrefProp.split("#/")[0] : hrefProp.split("#")[0],
-					loc=window.location.toString().split("#")[0];
+					wloc=window.location !== window.parent.location ? window.parent.location : window.location,
+					loc=wloc.toString().split("#")[0];
 				return href!=="#" && href.indexOf("#")!==-1 && (str==="" || decodeURIComponent(str)===decodeURIComponent(loc));
 			},
 			
@@ -399,7 +400,9 @@ THE SOFTWARE.
 			/* finds the element that should be highlighted */
 			
 			_findHighlight:function(id){
-				var wLoc=window.location,loc=wLoc.toString().split("#")[0],locPath=wLoc.pathname;
+				var wLoc=window.location !== window.parent.location ? window.parent.location : window.location,
+					loc=wLoc.toString().split("#")[0],
+					locPath=wLoc.pathname;
 				if(loc.indexOf("'")!==-1) loc=loc.replace("'","\\'");
 				if(locPath.indexOf("'")!==-1) locPath=locPath.replace("'","\\'");
 				loc=decodeURIComponent(loc);
@@ -466,6 +469,7 @@ THE SOFTWARE.
 			/* checks if target element is in viewport */
 			
 			_currentTarget:function(t){
+				if(!t.data(pluginPfx)) return; //handle Uncaught TypeError (undefined data)
 				var o=opt["target_"+t.data(pluginPfx).i],
 					dataTarget=t.data("ps2id-target"),
 					rect=dataTarget && $(dataTarget)[0] ? $(dataTarget)[0].getBoundingClientRect() : t[0].getBoundingClientRect();
