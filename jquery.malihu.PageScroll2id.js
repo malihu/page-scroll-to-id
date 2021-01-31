@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.6.5 
+Version: 1.6.6 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -95,6 +95,7 @@ THE SOFTWARE.
 	/* vars, constants */
 	
 		selector,opt,_init,_trigger,_clicked,_target,_to,_axis,_offset,_dataOffset,_totalInstances=0,_liveTimer,_speed,
+		specialChars=/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/,
 	
 	/* 
 	---------------
@@ -291,8 +292,8 @@ THE SOFTWARE.
 						if(opt.excludeSelectors && $this.is(opt.excludeSelectors)){ //excluded selectors
 							return;
 						}
-						var id=(href.indexOf("#/")!==-1) ? href.split("#/")[1] : href.split("#")[1],
-							t=id.indexOf("%")!==-1 ? $(document.getElementById(id)) : $("#"+id); //fix % in selector bug
+						var id=(href.indexOf("#/")!==-1) ? href.split("#/")[1] : href.substring(href.indexOf('#')+1), //we're not using str.split("#")[1] because we want only the first occurrence of # in case the id has # in its actual name 
+							t=specialChars.test(id) ? $(document.getElementById(id)) : $("#"+id); //fix bug with special characters like %, ?, & etc. in selector 
 						if(t.length>0){
 							if(opt.highlightByNextTarget){
 								if(t!==tp){
@@ -326,8 +327,8 @@ THE SOFTWARE.
 			/* finds the target element */
 			
 			_findTarget:function(str){
-				var val=(str.indexOf("#/")!==-1) ? str.split("#/")[1] : str.split("#")[1], 
-					el=val.indexOf("%")!==-1 ? $(document.getElementById(val)) : $("#"+val); //fix % in selector bug
+				var val=(str.indexOf("#/")!==-1) ? str.split("#/")[1] : str.substring(str.indexOf('#')+1), //we're not using str.split("#")[1] because we want only the first occurrence of # in case the id has # in its actual name 
+					el=specialChars.test(val) ? $(document.getElementById(val)) : $("#"+val); //fix bug with special characters like %, ?, & etc. in selector 
 				if(el.length<1 || el.css("position")==="fixed"){
 					if(val==="top"){
 						el=$("body");
@@ -611,7 +612,7 @@ THE SOFTWARE.
 					case "onStart":
 						//append hash to URL/address bar
 						if(opt.appendHash && window.history && window.history.pushState && _clicked && _clicked.length){
-							var h="#"+_clicked.attr("href").split("#")[1];
+							var hval=_clicked.attr("href"),h="#"+(hval.substring(hval.indexOf('#')+1)); //we're not using hval.split("#")[1] because we want only the first occurrence of # in case the id has # in its actual name 
 							if(h!==window.location.hash) history.pushState("","",h);
 						}
 						opt.onStart.call(null,this[pluginPfx]);
