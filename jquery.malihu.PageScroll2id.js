@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.6.6 
+Version: 1.6.7 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -89,7 +89,9 @@ THE SOFTWARE.
 			/* set specific selector(s) that will be excluded from being handled by the plugin: String */
 			excludeSelectors:false,
 			/* enable encodeURI for links (enable if your links have href values with UTF-8 encoding): boolean */
-			encodeLinks:false
+			encodeLinks:false,
+			/* enable to run the script inside iframe */
+			inIframe:false
 		},
 	
 	/* vars, constants */
@@ -277,7 +279,7 @@ THE SOFTWARE.
 				}
 				hrefProp=(!hrefProp) ? href : hrefProp;
 				var str=(hrefProp.indexOf("#/")!==-1) ? hrefProp.split("#/")[0] : hrefProp.split("#")[0],
-					wloc=window.location !== window.parent.location ? window.parent.location : window.location,
+					wloc=!opt.inIframe && window.location !== window.parent.location ? window.parent.location : window.location,
 					loc=wloc.toString().split("#")[0];
 				return href!=="#" && href.indexOf("#")!==-1 && (str==="" || decodeURIComponent(str)===decodeURIComponent(loc));
 			},
@@ -401,7 +403,7 @@ THE SOFTWARE.
 			/* finds the element that should be highlighted */
 			
 			_findHighlight:function(id){
-				var wLoc=window.location !== window.parent.location ? window.parent.location : window.location,
+				var wLoc=!opt.inIframe && window.location !== window.parent.location ? window.parent.location : window.location,
 					loc=wLoc.toString().split("#")[0],
 					locPath=wLoc.pathname;
 				if(loc.indexOf("'")!==-1) loc=loc.replace("'","\\'");
