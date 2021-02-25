@@ -1,6 +1,6 @@
 /*
 == Page scroll to id == 
-Version: 1.6.7 
+Version: 1.6.8 
 Plugin URI: http://manos.malihu.gr/page-scroll-to-id/
 Author: malihu
 Author URI: http://manos.malihu.gr
@@ -149,9 +149,9 @@ THE SOFTWARE.
 				if(opt.clickEvents){
 					$(document)
 					
-					.undelegate("."+pluginPfx)
+					.off("."+pluginPfx)
 					
-					.delegate(selector,"click."+pluginPfx,function(e){
+					.on("click."+pluginPfx,selector,function(e){
 						if(functions._isDisabled.call(null)){
 							functions._removeClasses.call(null);
 							return;
@@ -179,9 +179,9 @@ THE SOFTWARE.
 				
 				$(window)
 				
-				.unbind("."+pluginPfx)
+				.off("."+pluginPfx)
 				
-				.bind("scroll."+pluginPfx+" resize."+pluginPfx,function(){
+				.on("scroll."+pluginPfx+" resize."+pluginPfx,function(){
 					if(functions._isDisabled.call(null)){
 						functions._removeClasses.call(null);
 						return;
@@ -244,8 +244,8 @@ THE SOFTWARE.
 			/* destroy method */
 			
 			destroy:function(){
-				$(window).unbind("."+pluginPfx);
-				$(document).undelegate("."+pluginPfx).removeData(pluginPfx);
+				$(window).off("."+pluginPfx);
+				$(document).off("."+pluginPfx).removeData(pluginPfx);
 				$("._"+pluginPfx+"-t").removeData(pluginPfx);
 				functions._removeClasses.call(null,true);
 			}
